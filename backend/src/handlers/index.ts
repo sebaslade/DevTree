@@ -2,6 +2,7 @@ import { Request, Response } from 'express' // importa Request y Response de exp
 import { validationResult } from 'express-validator'
 import User from '../models/user' // importa el modelo User
 import { checkPassword, hashPassword } from '../utils/auth'
+import { generateJWT } from '../utils/jwt' // importa la función para generar JWT
 import slug from 'slug'
 
 export const createAccount = async(req: Request, res: Response) => { 
@@ -41,13 +42,16 @@ export const login = async(req: Request, res: Response) => {
     const user = await User.findOne({email}) // busca un usuario con el email proporcionado
     if (!user) { // si el usuario ya existe
         const error = new Error('El usuario no esta registrado') // crea un nuevo error
-        return res.status(409).json({error: error.message}) // devuelve un error 400
+        return res.status(404).json({error: error.message}) // devuelve un error 400
     }
     const isPasswordCorrect = await checkPassword(password, user.password) // verifica si la contraseña es correcta
     if (!isPasswordCorrect) {
         const error = new Error('Contraseña incorrecta')
         return res.status(401).json({error: error.message})
     }
+    // Generar JWT
+    const token = generateJWT({id: user._id}) // genera un token JWT para el usuario
+    res.send(token)
 
     res.status(200).send("Login exitoso")
 }

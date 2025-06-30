@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/index.ts",
+    "dev:api": "nodemon src/index.ts --api",
     "build": "tsc"
   },
-  "author": "Rodrigo Castilla",
+  "author": "Sebastián Laos",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^6.0.0",
