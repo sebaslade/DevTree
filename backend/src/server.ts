@@ -1,14 +1,19 @@
 //const express = require('express') //CJS Common JS
 import express from 'express' // ESM ecmascript modules
+import cors from 'cors' // para permitir peticiones de otros dominios
 import 'dotenv/config' // para leer el archivo .env
 import router from './router'
 import {connectDB} from './config/db'
+import {corsConfig} from './config/cors'
+
+// conexión a la base de datos
+connectDB()
 
 // instancia del servidor
 const app = express()
 
-// conexión a la base de datos
-connectDB()
+//Cors: Middleware para permitir peticiones de otros dominios
+app.use(cors(corsConfig))
 
 //Leer datos del formulario
 app.use(express.json())
