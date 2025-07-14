@@ -3,7 +3,7 @@ import {useForm} from "react-hook-form";
 import {isAxiosError} from "axios";
 import {toast} from "sonner";
 import type { RegisterForm } from "../types";
-import ErrorMessage from "../../components/ErrorMessage";
+import ErrorMessage from "../components/ErrorMessage";
 import api from "../config/axios";
 
 export default function RegisterView() {

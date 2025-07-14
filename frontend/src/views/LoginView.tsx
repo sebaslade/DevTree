@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import ErrorMessage from '../../components/ErrorMessage';
+import ErrorMessage from '../components/ErrorMessage';
 import type { LoginForm } from '../types';
 import {isAxiosError} from "axios";
 import {toast} from "sonner";
