@@ -18,14 +18,14 @@ export const aunthenticate = async (req: Request, res: Response, next: NextFunct
     try {
         const result = jwt.verify(token, process.env.JWT_SECRET!)
         if (typeof result === 'object' && result.id) {
-        const user = await User.findById(result.id).select('-password -__v')
-        if (!user) {
-            res.status(404).json({ error: 'Usuario no existe' })
-            return
-        }
+            const user = await User.findById(result.id).select('-password -__v')
+            if (!user) {
+                res.status(404).json({ error: 'Usuario no existe' })
+                return
+            }
 
-        ;(req as any).user = user
-        return next()
+            req.user = user
+            return next()
         }
     } catch (error) {
         res.status(401).json({ error: 'Token inválido' })

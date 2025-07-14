@@ -1,4 +1,4 @@
-import mongoose, { Schema } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
 interface IUser {
     handle: string;
@@ -7,7 +7,9 @@ interface IUser {
     password: string;
 }
 
-const userSchema = new Schema({
+export interface UserDocument extends IUser, Document {}
+
+const userSchema = new Schema<UserDocument>({
     //Atributos
     handle:{
         type: String,
@@ -35,6 +37,6 @@ const userSchema = new Schema({
 })
 
 //Creamos el modelo
-const UserModel = mongoose.model<IUser>('User', userSchema);
+const UserModel = mongoose.model<UserDocument>('User', userSchema);
 //Exportamos el modelo
 export default UserModel;
