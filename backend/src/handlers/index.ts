@@ -108,13 +108,13 @@ export const uploadImage = async (req: Request, res: Response) => {
     }
 }
 
-export const getUserByHandle = async (req: Request, res: Response) => {
+export const getUserByHandle = async (req: Request, res: Response): Promise<void> => {
     try {
         const { handle } = req.params
         const user = await User.findOne({ handle }).select('-_id -__v -email -password')
         if (!user) {
-            const error = new Error('El Usuario no existe')
-            res.status(404).json({ error: error.message })
+            res.status(404).json({ error: 'El Usuario no existe' });
+            return; 
         }
         res.json(user)
     } catch (e) {
@@ -123,17 +123,18 @@ export const getUserByHandle = async (req: Request, res: Response) => {
     }
 }
 
-export const searchByHandle = async (req: Request, res: Response) => {
+export const searchByHandle = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { handle } = req.body
-        const userExists = await User.findOne({handle})
-        if(userExists) {
-            const error = new Error(`${handle} ya está registrado`)
-            res.status(409).json({error: error.message})
+        const { handle } = req.body;
+        const userExists = await User.findOne({ handle });
+
+        if (userExists) {
+            res.status(409).json({ error: `${handle} ya está registrado` });
+            return;
         }
-        res.send(`${handle} está disponible`)
+
+        res.send(`${handle} está disponible`);
     } catch (e) {
-        const error = new Error('Hubo un error')
-        res.status(500).json({ error: error.message })
+        res.status(500).json({ error: 'Hubo un error' });
     }
 }
