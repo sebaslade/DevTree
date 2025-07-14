@@ -68,6 +68,10 @@ export default function DevTree({ data }: DevTreeProps) {
                         <div className="w-full md:w-96 bg-slate-800 px-5 py-10 space-y-6">
                             <p className='text-4xl text-center text-white'>{data.handle}</p>
 
+                            <p className="text-center text-white text-sm">
+                                {data.visits === 1 ? '1 visita' : `${data.visits} visitas`}
+                            </p>
+
                             {data.image &&
                                 <img src={data.image} alt='Imagen Perfil' className='mx-auto max-w-[250px]' />
                             }

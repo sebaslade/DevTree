@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import mongoose, { Schema, Document, Types } from 'mongoose';
 
 interface IUser {
     handle: string
@@ -8,6 +8,9 @@ interface IUser {
     description: string
     image: string
     links: string
+    visits: number
+    followers: Types.ObjectId[]
+    following: Types.ObjectId[]
 }
 
 export interface UserDocument extends IUser, Document {}
@@ -48,7 +51,13 @@ const userSchema = new Schema<UserDocument>({
     links: {
         type: String,
         default: '[]'
-    }
+    },
+    visits: {
+        type: Number,
+        default: 0
+    },
+    followers: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+    following: [{ type: Schema.Types.ObjectId, ref: 'User' }]
 })
 
 //Creamos el modelo

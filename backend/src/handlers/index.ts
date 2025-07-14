@@ -110,13 +110,19 @@ export const uploadImage = async (req: Request, res: Response) => {
 
 export const getUserByHandle = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { handle } = req.params
-        const user = await User.findOne({ handle }).select('-_id -__v -email -password')
+        const { handle: userHandle } = req.params
+
+        const user = await User.findOne({ handle: userHandle })
         if (!user) {
             res.status(404).json({ error: 'El Usuario no existe' });
             return; 
         }
-        res.json(user)
+
+        user.visits += 1; // Incrementa el contador de visitas
+        await user.save(); // Guarda el usuario actualizado
+
+        const { name, image, description, links, handle, visits } = user.toObject()
+        res.json({ name, image, description, links, handle, visits })
     } catch (e) {
         const error = new Error('Hubo un error')
         res.status(500).json({ error: error.message })
