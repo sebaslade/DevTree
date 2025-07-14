@@ -1,10 +1,10 @@
 import { Router, Request, Response } from 'express'
 // ermite configurar un objeto con todas las rutas que despues podemos agregar a la app principal server.ts
 import User from './models/user'
-import { createAccount,getUser,login } from './handlers/index'
+import { createAccount, getUser, getUserByHandle, login, searchByHandle, updateProfile, uploadImage } from './handlers/index'
 import {body} from 'express-validator' // Importa body y validationResult de express-validator
 import { handleInputErrors } from './middleware/validation'
-import { aunthenticate } from './middleware/auth'
+import { authenticate } from './middleware/auth'
 
 const router = Router()
 
@@ -29,6 +29,27 @@ router.post('/auth/login',
   } // Ruta para iniciar sesión
 )
 
-router.get('/user', aunthenticate, getUser)
+router.get('/user', authenticate, getUser)
+
+router.patch('/user',
+    body('handle')
+        .notEmpty()
+        .withMessage('El handle no puede ir vacio'),
+    handleInputErrors,
+    authenticate,
+    updateProfile
+)
+
+router.post('/user/image', authenticate, uploadImage)
+
+router.get('/:handle', getUserByHandle)
+
+router.post('/search',
+    body('handle')
+        .notEmpty()
+        .withMessage('El handle no puede ir vacio'),
+    handleInputErrors,
+    searchByHandle
+)
 
 export default router

@@ -1,10 +1,13 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 interface IUser {
-    handle: string;
-    name: string;
-    email: string;
-    password: string;
+    handle: string
+    name: string
+    email: string
+    password: string
+    description: string
+    image: string
+    links: string
 }
 
 export interface UserDocument extends IUser, Document {}
@@ -33,6 +36,18 @@ const userSchema = new Schema<UserDocument>({
         type: String,
         required: true,
         trim: true
+    },
+    description: {
+        type: String,
+        default: ''
+    },
+    image: {
+        type: String,
+        default: ''
+    },
+    links: {
+        type: String,
+        default: '[]'
     }
 })
 

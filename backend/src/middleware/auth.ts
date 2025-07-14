@@ -2,7 +2,7 @@ import type {Request, Response, NextFunction} from 'express'
 import jwt from 'jsonwebtoken'
 import User from '../models/user' // importa el modelo User
 
-export const aunthenticate = async (req: Request, res: Response, next: NextFunction) => {
+export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
     const bearer = req.headers.authorization
     if (!bearer) {
         res.status(401).json({ error: 'Token no proporcionado' })
