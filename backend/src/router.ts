@@ -4,6 +4,7 @@ import User from './models/user'
 import { createAccount,getUser,login } from './handlers/index'
 import {body} from 'express-validator' // Importa body y validationResult de express-validator
 import { handleInputErrors } from './middleware/validation'
+import { aunthenticate } from './middleware/auth'
 
 const router = Router()
 
@@ -28,11 +29,6 @@ router.post('/auth/login',
   } // Ruta para iniciar sesión
 )
 
-router.get('/user',
-  (req: Request, res: Response, next) => {
-    // Aquí iría la lógica para obtener el usuario
-    Promise.resolve(getUser(req, res)).catch(next);
-  } // Ruta para obtener el usuario autenticado
-)
+router.get('/user', aunthenticate, getUser)
 
 export default router
