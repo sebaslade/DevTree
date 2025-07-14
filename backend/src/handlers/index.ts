@@ -3,6 +3,7 @@ import { validationResult } from 'express-validator'
 import User from '../models/user' // importa el modelo User
 import { checkPassword, hashPassword } from '../utils/auth'
 import { generateJWT } from '../utils/jwt' // importa la función para generar JWT
+import jwt from 'jsonwebtoken' // importa jwt para verificar el token
 import slug from 'slug'
 
 export const createAccount = async(req: Request, res: Response) => { 
@@ -51,7 +52,32 @@ export const login = async(req: Request, res: Response) => {
     }
     // Generar JWT
     const token = generateJWT({id: user._id}) // genera un token JWT para el usuario
-    res.send(token)
-
+    res.status(200).json({ token }) 
     //res.status(200).send("Login exitoso")
+}
+
+export const getUser = async(req: Request, res: Response) => {
+    const bearer = req.headers.authorization // obtiene el token del encabezado de autorización
+    if (!bearer) {
+        const error = new Error('Token no proporcionado')
+        return res.status(401).json({error: error.message}) // si no hay token, devuelve un error 401
+    }
+    const [, token] = bearer.split(' ') // divide el encabezado para obtener el token
+    if (!token) {
+        const error = new Error('Usuario no autorizado')
+        return res.status(401).json({error: error.message}) // si no hay token, devuelve un error 401
+    }
+    try {
+        const result = jwt.verify(token, process.env.JWT_SECRET) // verifica el token
+        if(typeof result === 'object' && result.id) {
+            const user = await User.findById(result.id).select('-password -__v') // busca el usuario por su ID
+            if (!user) {
+                const error = new Error('Usuario no existe')
+                return res.status(404).json({error: error.message}) // si no se encuentra
+            }
+            res.json(user)
+        }
+    } catch (error) {
+        res.status(500).json({error: 'Token inválido'}) // si el token es inválido, devuelve un error 401
+    }
 }

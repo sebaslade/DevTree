@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express'
 // ermite configurar un objeto con todas las rutas que despues podemos agregar a la app principal server.ts
 import User from './models/user'
-import { createAccount,login } from './handlers/index'
+import { createAccount,getUser,login } from './handlers/index'
 import {body} from 'express-validator' // Importa body y validationResult de express-validator
 import { handleInputErrors } from './middleware/validation'
 
@@ -26,6 +26,13 @@ router.post('/auth/login',
     // Aquí iría la lógica de autenticación
     Promise.resolve(login(req, res)).catch(next);
   } // Ruta para iniciar sesión
+)
+
+router.get('/user',
+  (req: Request, res: Response, next) => {
+    // Aquí iría la lógica para obtener el usuario
+    Promise.resolve(getUser(req, res)).catch(next);
+  } // Ruta para obtener el usuario autenticado
 )
 
 export default router
