@@ -236,3 +236,24 @@ export const unfollowUser = async (req: Request, res: Response) => {
         res.status(500).json({ error: 'Hubo un error' })
     }
 }
+
+export const searchUsersPreview = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const q = req.query.q as string
+    if (!q || q.trim() === '') {
+      res.json([])
+      return
+    }
+
+    const regex = new RegExp(`^${q}`, 'i')
+
+    const users = await User.find({ handle: regex })
+      .select('handle name image')
+      .limit(10)
+
+    res.json(users)
+  } catch (e) {
+    console.error(e)
+    res.status(500).json({ error: 'Hubo un error al buscar usuarios' })
+  }
+}

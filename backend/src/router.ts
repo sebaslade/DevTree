@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express'
 // ermite configurar un objeto con todas las rutas que despues podemos agregar a la app principal server.ts
 import User from './models/user'
-import { createAccount, followUser, getUser, getUserByHandle, login, searchByHandle, unfollowUser, updateProfile, uploadImage } from './handlers/index'
+import { createAccount, followUser, getUser, getUserByHandle, login, searchByHandle, searchUsersPreview, unfollowUser, updateProfile, uploadImage } from './handlers/index'
 import {body} from 'express-validator' // Importa body y validationResult de express-validator
 import { handleInputErrors } from './middleware/validation'
 import { authenticate } from './middleware/auth'
@@ -41,6 +41,8 @@ router.patch('/user',
 )
 
 router.post('/user/image', authenticate, uploadImage)
+
+router.get('/search', authenticate, searchUsersPreview)
 
 router.get('/:handle', authenticate, getUserByHandle)
 
