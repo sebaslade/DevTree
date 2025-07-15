@@ -54,7 +54,7 @@ export default function FollowButton({ profileHandle, isFollowingInitially }: Fo
     onSuccess: () => {
       toast.success(`Ahora sigues a @${profileHandle}`)
       setIsFollowing(true)
-      queryClient.invalidateQueries({ queryKey: ['handle', profileHandle] }) // 👈 usa la misma key
+      queryClient.invalidateQueries({ queryKey: ['user', profileHandle] })
     },
     onError: (error: any) => toast.error(error.message)
   })

@@ -39,8 +39,13 @@ export async function uploadImage(file: File) {
 
 export async function getUserByHandle(handle: string) {
     try {
-        const url = `/${handle}`
-        const { data } = await api.get<UserHandle>(url)
+        const token = localStorage.getItem('AUTH_TOKEN')
+        const { data } = await api.get<UserHandle>(`/${handle}`, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+
         return data
     } catch (error) {
         if (isAxiosError(error) && error.response) {

@@ -7,13 +7,13 @@ export default function HandleView() {
 
     const params = useParams()
     const handle = params.handle!
-    const { data, error, isLoading } = useQuery({
+    const { data: user, error, isLoading } = useQuery({
         queryFn: () => getUserByHandle(handle),
-        queryKey: ['handle', handle],
+        queryKey: ['user', handle],
         retry: 1
     })
 
     if(isLoading) return <p className='text-center text-white'>Cargando...</p>
     if(error) return <Navigate to={'/404'} />
-    if(data) return <HandleData data={data} isFollowingInitially={data.isFollowing} />
+    if(user) return <HandleData data={user} isFollowingInitially={user.isFollowing} />
 }
