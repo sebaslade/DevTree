@@ -1,12 +1,13 @@
 import { Request, Response } from 'express' // importa Request y Response de express
 import { validationResult } from 'express-validator'
-import User from '../models/user' // importa el modelo User
+import User, { UserDocument } from '../models/user' // importa el modelo User
 import { checkPassword, hashPassword } from '../utils/auth'
 import { generateJWT } from '../utils/jwt' // importa la función para generar JWT
 import { v4 as uuid } from 'uuid'
 import slug from 'slug'
 import formidable from 'formidable'
 import cloudinary from '../config/cloudinary'
+import mongoose, { Types } from 'mongoose'
 
 export const createAccount = async(req: Request, res: Response) => { 
     const {email, password} = req.body // extrae el email del cuerpo de la petición
@@ -120,9 +121,22 @@ export const getUserByHandle = async (req: Request, res: Response): Promise<void
 
         user.visits += 1; // Incrementa el contador de visitas
         await user.save(); // Guarda el usuario actualizado
+        
+        const currentUser = req.user as UserDocument | undefined
 
-        const { name, image, description, links, handle, visits } = user.toObject()
-        res.json({ name, image, description, links, handle, visits })
+         const isFollowing = currentUser
+            ? user.followers.some((followerId) => followerId.equals(currentUser._id))
+            : false
+
+        const { name, image, description, links, handle, visits, followers, following } = user.toObject()
+        res.json({ name, image, description, links, handle, visits, 
+            followersCount: followers.length,
+            followingCount: following.length,
+            followers: followers,
+            following: following,
+            isFollowing
+            
+        })
     } catch (e) {
         const error = new Error('Hubo un error')
         res.status(500).json({ error: error.message })
@@ -142,5 +156,83 @@ export const searchByHandle = async (req: Request, res: Response): Promise<void>
         res.send(`${handle} está disponible`);
     } catch (e) {
         res.status(500).json({ error: 'Hubo un error' });
+    }
+}
+
+export const followUser = async (req: Request, res: Response) => {
+    try {
+        const { handle } = req.params;
+        const currentUser = req.user as UserDocument;
+
+        if (!currentUser) {
+            res.status(401).json({ error: 'No autenticado' });
+        }
+
+        const targetUser = await User.findOne({ handle });
+        if (!targetUser) {
+            res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        // Evitar seguirse a sí mismo
+        if (targetUser._id.toString() === currentUser._id.toString()) {
+            res.status(400).json({ error: 'No puedes seguirte a ti mismo' });
+        }
+
+        // Verificar si ya sigue
+        const alreadyFollowing = targetUser.followers.some(
+            id => id.toString() === currentUser._id.toString()
+        );
+
+        if (alreadyFollowing) {
+            res.json({ message: 'Ya sigues a este usuario' });
+        }
+
+        await User.updateOne(
+            { _id: targetUser._id },
+            { $addToSet: { followers: currentUser._id } }
+        );
+
+        await User.updateOne(
+            { _id: currentUser._id },
+            { $addToSet: { following: targetUser._id } }
+        );
+        res.json({ message: `Ahora sigues a @${targetUser.handle}` });
+
+    } catch (e) {
+        res.status(500).json({ error: 'Hubo un error' })
+    }
+}
+
+export const unfollowUser = async (req: Request, res: Response) => {
+    try {
+        const { handle } = req.params
+        const targetUser = await User.findOne({ handle })
+
+        if (!targetUser) {
+            res.status(404).json({ error: 'El usuario no existe' })
+        }
+
+        const currentUser = await User.findById(req.user._id)
+
+        if (!currentUser) {
+            res.status(401).json({ error: 'No autorizado' })
+        }
+
+        const targetId = targetUser._id as Types.ObjectId
+        const currentId = currentUser._id as Types.ObjectId
+
+        currentUser.following = currentUser.following.filter(id =>
+            !(id as Types.ObjectId).equals(targetId)
+        )
+        targetUser.followers = targetUser.followers.filter(id =>
+            !(id as Types.ObjectId).equals(currentId)
+        )
+
+        await currentUser.save()
+        await targetUser.save()
+
+        res.json({ message: `Has dejado de seguir a @${targetUser.handle}` })
+    } catch (e) {
+        res.status(500).json({ error: 'Hubo un error' })
     }
 }

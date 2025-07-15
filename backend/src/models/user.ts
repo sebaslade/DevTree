@@ -13,7 +13,9 @@ interface IUser {
     following: Types.ObjectId[]
 }
 
-export interface UserDocument extends IUser, Document {}
+export interface UserDocument extends IUser, Document {
+    _id: Types.ObjectId
+}
 
 const userSchema = new Schema<UserDocument>({
     //Atributos

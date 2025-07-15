@@ -7,8 +7,16 @@ export type User = {
     image: string
     links: string
     visits: number
+    followersCount: number
+    followingCount: number
+    followers?: string[]
+    following?: string[]
+    isFollowing: boolean
 }
-export type UserHandle = Pick<User, 'description' | 'handle' | 'image' | 'links' | 'name' | 'visits'>
+export type UserHandle = Pick<User, 'description' | 'handle' | 'image' | 'links' | 'name' | 'visits' | 'followersCount' > & {
+    isFollowing: boolean
+}
+
 
 export type RegisterForm = Pick<User, 'handle' | 'email' | 'name'> & {
     password: string
