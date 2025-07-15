@@ -12,6 +12,11 @@ connectDB()
 // instancia del servidor
 const app = express()
 
+app.get('/', (req, res) => {
+  res.send('¡Servidor funcionando correctamente! 🚀');
+});
+
+
 //Cors: Middleware para permitir peticiones de otros dominios
 app.use(cors(corsConfig))
 
